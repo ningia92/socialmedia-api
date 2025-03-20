@@ -52,25 +52,14 @@ export const updatePost = async (req, res) => {
 // @route  DELETE /api/v1/posts/:id
 export const deletePost = async (req, res) => {
   const id = req.params.id
-  const post = await Post.findById(id)
+  const userId = req.user.userId
 
+  const post = await Post.findById(id)
   if (!post) throw Object.assign(new Error('Post not found'), { statusCode: 404 })
 
-  if (req.user.userId !== String(post.author)) throw Object.assign(new Error('Forbidden'), { statusCode: 403 })
+  if (userId !== String(post.author)) throw Object.assign(new Error('Forbidden'), { statusCode: 403 })
 
-  await Post.deleteOne(post)
+  await post.deleteOne()
 
   res.status(204).end()
-}
-
-// @desc   Get all user posts
-// @route  GET /api/v1/posts/user/:id
-export const getUserPosts = async (req, res) => {
-  const userId = req.params.id
-
-  const posts = await Post.find({ author: userId }).select('-author -__v -_id')
-
-  if (posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
-
-  res.status(200).json({ posts })
 }

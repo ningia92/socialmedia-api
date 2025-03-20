@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const UserSchema = new mongoose.Schema({
@@ -24,18 +24,23 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'User password is required'],
     minLength: 6,
   },
-  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, { timestamps: true })
 
+// before save the password transform it into hashed password
 UserSchema.pre('save', async function () {
   const salt = await bcrypt.genSalt()
   this.password = await bcrypt.hash(this.password, salt)
 })
 
+// during login compare the user input password with the saved hashed password
 UserSchema.methods.comparePasswords = async function (password) {
   return await bcrypt.compare(password, this.password)
 }
 
+// create JWT token when the user registers or logs in
 UserSchema.methods.createJWT = function () {
   return jwt.sign({ userId: this._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION })
 }
