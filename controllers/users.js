@@ -1,4 +1,5 @@
 import User from '../models/user.js'
+import Post from '../models/post.js'
 
 // @desc   Get user
 // @route  GET /api/v1/users/:id
@@ -64,7 +65,7 @@ export const deleteUser = async (req, res) => {
 
 // @desc   Get user posts
 // @route  GET /api/v1/users/:id/posts
-export const getUserPosts = async (req, res) => {
+export const getPosts = async (req, res) => {
   const id = req.params.id
 
   const user = await User.findById(id).populate('posts', '-author')
@@ -114,6 +115,22 @@ export const getFollowings = async (req, res) => {
     user: user.name,
     followings
   })
+}
+
+// @desc   Get user feed
+// @route  GET /api/v1/users/:id/feed
+export const getFeed = async (req, res) => {
+  const userId = req.user.userId
+
+  if (userId !== req.params.id) throw Object.assign(new Error(`You can't access the feed of other users`), { statusCode: 403 })
+
+  const user = await User.findById(userId).populate('followings')
+  const followingsIds = user.followings.map(following => following._id)
+  
+  const posts = await Post.find({ author: { $in: followingsIds } })
+  if (posts.length === 0) return res.status(200).json({ message: 'Empty feed' })
+  
+  res.status(200).json({ feed: posts })
 }
 
 // @desc   Follow User

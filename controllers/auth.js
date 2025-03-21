@@ -37,6 +37,7 @@ export const loginUser = async (req, res) => {
     message: 'User logged in',
     user: {
       id: user._id,
+      name: user.name,
       token: token
     }
   })

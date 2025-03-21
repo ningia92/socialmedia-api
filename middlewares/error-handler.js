@@ -4,10 +4,10 @@ const errorHandler = (err, req, res, next) => {
     statusCode: err.statusCode || 500,
   }
 
-  // mongoose bad ObjectId
+  // mongoose bad data format
   if (err.name === 'CastError') {
-    error.message = 'Resource not found',
-    error.statusCode = 404
+    error.message = 'Invalid data format',
+    error.statusCode = 400
   }
 
   // mongoose duplicate key
@@ -17,9 +17,21 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // mongoose validation error
-  if (error.code === 'ValidationError') {
+  if (error.name === 'ValidationError') {
     error.message = Object.values(err.errors).map(item => item.message).join(',')
     error.statusCode = 400
+  }
+
+  // jwt error
+  if (error.name === 'JsonWebTokenError') {
+    error.message = 'Invalid token',
+    error.statusCode = 401
+  }
+
+  // jwt expired
+  if (error.name === 'TokenExipiredError') {
+    error.message = 'Expired token',
+    error.statusCode = 401
   }
 
   console.error(err)
