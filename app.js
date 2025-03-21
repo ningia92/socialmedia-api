@@ -1,5 +1,6 @@
 import express from 'express'
 import 'express-async-errors'
+import morgan from 'morgan'
 import connectDB from './database/mongodb.js'
 import authRouter from './routes/auth.js'
 import userRouter from './routes/users.js'
@@ -11,6 +12,7 @@ import authorize from './middlewares/auth.js'
 const app = express()
 const PORT = process.env.PORT || 3000
 
+app.use(morgan('dev'))
 app.use(express.json())
 
 app.get('/', (req, res) => res.send('<h1>Social Media API</h1>'))

@@ -26,16 +26,23 @@ const UserSchema = new mongoose.Schema({
   },
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+  followings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, { timestamps: true })
 
-// before save the password transform it into hashed password
+UserSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    delete returnedObject.__v
+    delete returnedObject.password
+  }
+})
+
+// before save the password hash it
 UserSchema.pre('save', async function () {
   const salt = await bcrypt.genSalt()
   this.password = await bcrypt.hash(this.password, salt)
 })
 
-// during login compare the user input password with the saved hashed password
+// compare the user input password with the saved hashed password
 UserSchema.methods.comparePasswords = async function (password) {
   return await bcrypt.compare(password, this.password)
 }

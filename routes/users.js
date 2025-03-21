@@ -1,30 +1,25 @@
 import { Router } from 'express'
-import { 
-  getLoggedUser,
-  getLoggedUserPosts,
-  getLoggedUserFollowers,
-  getLoggedUserFollowing,
-  followUser,
-  unfollowUser,
+import {
   getUser,
+  updateName,
+  updatePassword,
+  deleteUser,
   getUserPosts,
   getFollowers,
-  getFollowing,
+  getFollowings,
+  followUser,
+  unfollowUser
 } from '../controllers/users.js'
 const userRouter = Router()
 
 // path: /api/v1/users
-// routes for the logged user
-userRouter.get('/me', getLoggedUser)
-userRouter.get('/me/posts', getLoggedUserPosts)
-userRouter.get('/me/followers', getLoggedUserFollowers)
-userRouter.get('/me/following', getLoggedUserFollowing)
-userRouter.post('/me/following/:id', followUser)
-userRouter.delete('/me/following/:id', unfollowUser)
-// routes to get info of other users
-userRouter.get('/:id', getUser)
+userRouter.route('/:id').get(getUser).delete(deleteUser)
+userRouter.patch('/:id/name', updateName)
+userRouter.patch('/:id/password', updatePassword)
 userRouter.get('/:id/posts', getUserPosts)
 userRouter.get('/:id/followers', getFollowers)
-userRouter.get('/:id/following', getFollowing)
+userRouter.get('/:id/followings', getFollowings)
+userRouter.patch('/:id/follow', followUser)
+userRouter.patch('/:id/unfollow', unfollowUser)
 
 export default userRouter

@@ -1,87 +1,6 @@
 import User from '../models/user.js'
 
-// @desc   Get logged user details
-// @route  GET /api/v1/users/me
-export const getLoggedUser = async (req, res) => {
-  const userId = req.user.userId
-  const user = await User.findById(userId)
-
-  res.status(200).json({
-    name: user.name,
-    numberOfFollower: user.followers.length,
-    numberOfFollowing: user.following.length,
-    numberOfPosts: user.posts.length
-  })
-}
-
-// @desc   Get logged user posts
-// @route  GET /api/v1/users/me/posts
-export const getLoggedUserPosts = async (req, res) => {
-  const userId = req.user.userId
-  const user = await User.findById(userId).populate('posts', '-__v, -_id -author')
-
-  if (user.posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
-
-  res.status(200).json({ posts: user.posts })
-}
-
-// @desc   Get logged user followers
-// @route  GET /api/v1/users/me/followers
-export const getLoggedUserFollowers = async (req, res) => {
-  const userId = req.user.userId
-  const user = await User.findById(userId).populate('followers', 'name')
-
-  if (user.followers.length === 0) return res.status(200).json({ message: 'No followers yet' })
-
-  res.status(200).json({ followers: user.followers })
-}
-
-// @desc   Get logged user following
-// @route  GET /api/v1/users/me/following
-export const getLoggedUserFollowing = async (req, res) => {
-  const userId = req.user.userId
-  const user = await User.findById(userId).populate('following', 'name')
-
-  if (user.following.length === 0) return res.status(200).json({ message: 'No following yet' })
-
-  res.status(200).json({ following: user.following })
-}
-
-// @desc   Follow User
-// @route  POST /api/v1/users/me/following/:id
-export const followUser = async (req, res) => {
-  const userId = req.user.userId
-  const targeUserId = req.params.id
-
-  if (!targeUserId) throw Object.assign(new Error('Please provide user id'), { statusCode: 400 })
-
-  const targetUser = await User.findById(targeUserId)
-  if (!targetUser) throw Object.assign(new Error('User not found'), { statusCode: 404 })
-
-  await User.findByIdAndUpdate(userId, { $push: { following: targeUserId } }, { new: true })
-  await User.findByIdAndUpdate(targeUserId, { $push: { followers: userId } }, { new: true })
-
-  res.status(204).end()
-}
-
-// @desc   Unfollow User
-// @route  DELETE /api/v1/users/me/following/:id
-export const unfollowUser = async (req, res) => {
-  const userId = req.user.userId
-  const targeUserId = req.params.id
-
-  if (!targeUserId) throw Object.assign(new Error('Please provide user id'), { statusCode: 400 })
-
-  const targetUser = await User.findById(targeUserId)
-  if (!targetUser) throw Object.assign(new Error('User not found'), { statusCode: 404 })
-
-  await User.findByIdAndUpdate(userId, { $pull: { following: targeUserId } }, { new: true })
-  await User.findByIdAndUpdate(targeUserId, { $pull: { followers: userId } }, { new: true })
-
-  res.status(204).end()
-}
-
-// @desc   Get user details
+// @desc   Get user
 // @route  GET /api/v1/users/:id
 export const getUser = async (req, res) => {
   const id = req.params.id
@@ -89,12 +8,56 @@ export const getUser = async (req, res) => {
 
   if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 })
 
-  res.status(200).json({
-    name: user.name,
-    numberOfFollower: user.followers.length,
-    numberOfFollowing: user.following.length,
-    numberOfPosts: user.posts.length
-  })
+  res.status(200).json(user)
+}
+
+// @desc   Update user name
+// @route  PATCH /api/v1/users/:id/name
+export const updateName = async (req, res) => {
+  const userId = req.user.userId
+  const id = req.params.id
+  if (userId !== id) throw Object.assign(new Error(`You can't update someone else's name`), { statusCode: 403 })
+
+  const name = req.body
+  if (!name) throw Object.assign(new Error('Name field cannot be empty'), { statusCode: 400 })
+
+  await User.findByIdAndUpdate(userId, name, { new: true })
+
+  res.status(204).end()
+}
+
+// @desc   Update user password
+// @route  PATCH /api/v1/users/:id/password
+export const updatePassword = async (req, res) => {
+  const userId = req.user.userId
+  const id = req.params.id
+  if (userId !== id) throw Object.assign(new Error(`You can't update someone else's password`), { statusCode: 403 })
+
+  const { currentPassword, newPassword } = req.body
+  if (!currentPassword || !newPassword) {
+    throw Object.assign(new Error('You must provide both your current password and your new password'), { statusCode: 400 })
+  }
+
+  const user = await User.findById(userId)
+
+  const isMatch = await user.comparePasswords(currentPassword)
+  if (!isMatch) throw Object.assign(new Error('Current password is incorrect'), { statusCode: 401 })
+
+  user.password = newPassword
+  await user.save()
+
+  res.status(204).end()
+}
+
+// @desc   Delete user
+// @route  DELETE /api/v1/users/:id
+export const deleteUser = async (req, res) => {
+  const userId = req.user.userId
+  const id = req.params.id
+
+  if (userId !== id) throw Object.assign(new Error(`You can't delete other user`), { statusCode: 403 })
+
+
 }
 
 // @desc   Get user posts
@@ -102,7 +65,7 @@ export const getUser = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   const id = req.params.id
 
-  const user = await User.findById(id).populate('posts', '-_id -__v -author')
+  const user = await User.findById(id).populate('posts', '-author')
   if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 })
 
   if (user.posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
@@ -120,7 +83,7 @@ export const getUserPosts = async (req, res) => {
 export const getFollowers = async (req, res) => {
   const id = req.params.id
 
-  const user = await User.findById(id).populate('followers')
+  const user = await User.findById(id).populate('followers', 'name email')
   if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 })
 
   const followers = user.followers
@@ -133,20 +96,62 @@ export const getFollowers = async (req, res) => {
   })
 }
 
-// @desc   Get user following
-// @route  GET /api/v1/users/:id/following
-export const getFollowing = async (req, res) => {
+// @desc   Get user followings
+// @route  GET /api/v1/users/:id/followings
+export const getFollowings = async (req, res) => {
   const id = req.params.id
 
-  const user = await User.findById(id).populate('following')
+  const user = await User.findById(id).populate('followings', 'name email')
   if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 })
 
-  const following = user.following
+  const followings = user.followings
 
-  if (following.length === 0) return res.status(200).json({ message: 'No following yet' })
+  if (followings.length === 0) return res.status(200).json({ message: 'No followings yet' })
 
   res.status(200).json({
     user: user.name,
-    following
+    followings
   })
+}
+
+// @desc   Follow User
+// @route  PATCH /api/v1/users/:id/follow
+export const followUser = async (req, res) => {
+  const userId = req.user.userId
+  const targetUserId = req.params.id
+
+  const targetUser = await User.findById(targetUserId)
+  if (!targetUser) throw Object.assign(new Error('User not found'), { statusCode: 404 })
+
+  if (userId === targetUserId) throw Object.assign(new Error(`You can't follow yourself`), { statusCode: 403 })
+
+  if (targetUser.followers.includes(userId)) {
+    throw Object.assign(new Error('You already follow this user'), { statusCode: 403 })
+  }
+
+  await User.findByIdAndUpdate(userId, { $push: { followings: targetUserId } }, { new: true })
+  await User.findByIdAndUpdate(targetUserId, { $push: { followers: userId } }, { new: true })
+
+  res.status(204).end()
+}
+
+// @desc   Unfollow User
+// @route  PATCH /api/v1/users/:id/unfollow
+export const unfollowUser = async (req, res) => {
+  const userId = req.user.userId
+  const targetUserId = req.params.id
+
+  const targetUser = await User.findById(targetUserId)
+  if (!targetUser) throw Object.assign(new Error('User not found'), { statusCode: 404 })
+
+  if (userId === targetUserId) throw Object.assign(new Error(`You can't unfollow yourself`), { statusCode: 403 })
+
+  if (!targetUser.followers.includes(userId)) {
+    throw Object.assign(new Error(`You don't follow this user`), { statusCode: 403 })
+  }
+
+  await User.findByIdAndUpdate(userId, { $pull: { followings: targetUserId } }, { new: true })
+  await User.findByIdAndUpdate(targetUserId, { $pull: { followers: userId } }, { new: true })
+
+  res.status(204).end()
 }

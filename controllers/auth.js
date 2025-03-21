@@ -12,8 +12,9 @@ export const registerUser = async (req, res) => {
   res.status(201).json({
     message: 'User registered',
     user: {
-      name: user.name,
       id: user._id,
+      name: user.name,
+      email: user.email,
       token: token
     }
   })
@@ -35,7 +36,6 @@ export const loginUser = async (req, res) => {
   res.status(200).json({
     message: 'User logged in',
     user: {
-      name: user.name,
       id: user._id,
       token: token
     }

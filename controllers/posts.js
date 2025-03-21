@@ -63,3 +63,21 @@ export const deletePost = async (req, res) => {
 
   res.status(204).end()
 }
+
+// @desc   Like/Dislike post
+// @route  PATCH /api/v1/posts/:id/like
+export const likeDislikePost = async (req, res) => {
+  const userId = req.user.userId
+  const id = req.params.id
+  const post = await Post.findById(id)
+
+  if (!post) throw Object.assign(new Error('Post not found'), { statusCode: 404 })
+  
+  if (!post.likes.includes(userId)) {
+    await Post.findByIdAndUpdate(id, { $push: { likes: userId } }, { new: true })
+    res.status(200).json({ message: 'The post has been liked' })
+  } else {
+    await Post.findByIdAndUpdate(id, { $pull: { likes: userId } }, { new: true })
+    res.status(200).json({ message: 'The post has been disliked' })
+  }
+}

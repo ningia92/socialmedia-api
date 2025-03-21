@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { mongo } from 'mongoose'
 
 const PostSchema = new mongoose.Schema({
   author: {
@@ -15,8 +15,15 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: [true, 'The description of the post is required'],
     maxLength: 200
-  }
+  },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true })
+
+PostSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    delete returnedObject.__v
+  }
+})
 
 // before save the post add the post reference to the user posts
 PostSchema.pre('save', async function () {
