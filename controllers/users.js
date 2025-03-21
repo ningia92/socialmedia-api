@@ -57,7 +57,9 @@ export const deleteUser = async (req, res) => {
 
   if (userId !== id) throw Object.assign(new Error(`You can't delete other user`), { statusCode: 403 })
 
+  await User.findByIdAndDelete(userId)
 
+  res.status(204).end()
 }
 
 // @desc   Get user posts
