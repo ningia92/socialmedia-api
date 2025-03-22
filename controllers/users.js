@@ -117,19 +117,25 @@ export const getFollowings = async (req, res) => {
   })
 }
 
-// @desc   Get user feed
-// @route  GET /api/v1/users/:id/feed
+// @desc   Get feed
+// @route  GET /api/v1/users/:id/feed?order=<asc/desc>&author=<id>
 export const getFeed = async (req, res) => {
   const userId = req.user.userId
+  const order = req.query.order
+  const author = req.query.author
 
   if (userId !== req.params.id) throw Object.assign(new Error(`You can't access the feed of other users`), { statusCode: 403 })
 
-  const user = await User.findById(userId).populate('followings')
-  const followingsIds = user.followings.map(following => following._id)
-  
-  const posts = await Post.find({ author: { $in: followingsIds } })
+  const user = await User.findById(userId)
+  const followingsIds = user.followings
+
+  let posts = await Post.find({ author: { $in: followingsIds } }).populate('author', 'name')
   if (posts.length === 0) return res.status(200).json({ message: 'Empty feed' })
-  
+
+  // query filters
+  if (order === 'desc') posts.sort((a, b) => b.createdAt - a.createdAt)
+  if (author) posts = posts.filter(post => String(post.author._id) === author)
+
   res.status(200).json({ feed: posts })
 }
 
