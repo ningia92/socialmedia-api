@@ -1,0 +1,520 @@
+openapi: 3.0.0
+info:
+  title: Social Media API
+  version: "1.0"
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        description: User registration data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security: []
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Log in a user
+      operationId: loginUser
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+      security: []
+  /users/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get user profile
+      operationId: getUser
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      operationId: deleteUser
+      responses:
+        '204':
+          description: User deleted successfully
+  /users/{id}/name:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    patch:
+      tags:
+        - Users
+      summary: Update user name
+      operationId: updateName
+      requestBody:
+        description: New name for the user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: User name updated successfully
+  /users/{id}/password:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    patch:
+      tags:
+        - Users
+      summary: Update user password
+      operationId: updatePassword
+      requestBody:
+        description: New password for the user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User password updated successfully
+  /users/{id}/posts:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get posts created by the user
+      operationId: getPosts
+      responses:
+        '200':
+          description: List of user's posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+  /users/{id}/followers:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get user's followers
+      operationId: getFollowers
+      responses:
+        '200':
+          description: List of followers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/{id}/followings:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get user's followings
+      operationId: getFollowings
+      responses:
+        '200':
+          description: List of followings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/{id}/follow:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of the user performing the follow action
+        required: true
+        schema:
+          type: string
+    patch:
+      tags:
+        - Users
+      summary: Follow a user
+      operationId: followUser
+      requestBody:
+        description: Target user to follow
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetUserId:
+                  type: string
+      responses:
+        '200':
+          description: Successfully followed the user
+  /users/{id}/unfollow:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of the user performing the unfollow action
+        required: true
+        schema:
+          type: string
+    patch:
+      tags:
+        - Users
+      summary: Unfollow a user
+      operationId: unfollowUser
+      requestBody:
+        description: Target user to unfollow
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetUserId:
+                  type: string
+      responses:
+        '200':
+          description: Successfully unfollowed the user
+  /users/{id}/feed:
+    parameters:
+      - in: path
+        name: id
+        description: The user ID whose feed will be retrieved
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get feed from followed users
+      operationId: getFeed
+      responses:
+        '200':
+          description: List of posts from followed users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feed:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+  /posts:
+    post:
+      tags:
+        - Posts
+      summary: Create a new post
+      operationId: createPost
+      requestBody:
+        description: Post creation data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    get:
+      tags:
+        - Posts
+      summary: Get all posts
+      operationId: getAllPosts
+      responses:
+        '200':
+          description: List of all posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+  /posts/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The post ID
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Posts
+      summary: Get a single post by ID
+      operationId: getPost
+      responses:
+        '200':
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    patch:
+      tags:
+        - Posts
+      summary: Update a post
+      operationId: updatePost
+      requestBody:
+        description: Post update data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostRequest'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      operationId: deletePost
+      responses:
+        '204':
+          description: Post deleted successfully
+  /posts/{id}/like:
+    parameters:
+      - in: path
+        name: id
+        description: The post ID to like/dislike
+        required: true
+        schema:
+          type: string
+    patch:
+      tags:
+        - Posts
+      summary: Toggle like/dislike for a post
+      operationId: likeDislikePost
+      responses:
+        '200':
+          description: Post like/dislike toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        name: Bob
+        email: bob@example.com
+        password: secret
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: bob@example.com
+        password: secret
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        followers:
+          type: array
+          items:
+            type: string
+        followings:
+          type: array
+          items:
+            type: string
+        posts:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        _id: "61e8c0a54f1a4c3a4c4f7f1a"
+        name: Bob
+        email: bob@example.com
+        followers: []
+        followings: []
+        posts: []
+        createdAt: "2025-03-21T10:00:00.000Z"
+        updatedAt: "2025-03-21T10:00:00.000Z"
+    CreatePostRequest:
+      type: object
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+      example:
+        title: "My First Post"
+        description: "This is the content of my first post."
+    UpdatePostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+      example:
+        title: "Updated Title"
+        description: "Updated content of the post."
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+        author:
+          $ref: '#/components/schemas/User'
+        title:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        _id: "61e8c0a54f1a4c3a4c4f7f1b"
+        author:
+          _id: "61e8c0a54f1a4c3a4c4f7f1a"
+          name: Bob
+          email: bob@example.com
+          followers: []
+          followings: []
+          posts: []
+          createdAt: "2025-03-21T10:00:00.000Z"
+          updatedAt: "2025-03-21T10:00:00.000Z"
+        title: "My First Post"
+        description: "This is the content of my first post."
+        likes: []
+        createdAt: "2025-03-21T10:00:00.000Z"
+        updatedAt: "2025-03-21T10:00:00.000Z"
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+security:
+  - httpBearer: []
+tags:
+  - name: Auth
+  - name: Users
+  - name: Posts 

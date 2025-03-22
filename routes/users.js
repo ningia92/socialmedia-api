@@ -4,7 +4,6 @@ import {
   updateName,
   updatePassword,
   deleteUser,
-  getPosts,
   getFollowers,
   getFollowings,
   followUser,
@@ -17,7 +16,6 @@ const userRouter = Router()
 userRouter.route('/:id').get(getUser).delete(deleteUser)
 userRouter.patch('/:id/name', updateName)
 userRouter.patch('/:id/password', updatePassword)
-userRouter.get('/:id/posts', getPosts)
 userRouter.get('/:id/followers', getFollowers)
 userRouter.get('/:id/followings', getFollowings)
 userRouter.patch('/:id/follow', followUser)

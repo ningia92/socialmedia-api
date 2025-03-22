@@ -15,6 +15,10 @@ import slowDown from 'express-slow-down'
 import mongoSanitize from 'express-mongo-sanitize'
 import { xss } from 'express-xss-sanitizer'
 import helmet from 'helmet'
+// swagger doc
+import swaggerUI from 'swagger-ui-express'
+import YAML from 'yamljs'
+const swaggerDocument = YAML.load('./swagger.yaml')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -42,10 +46,12 @@ app.use(mongoSanitize())
 app.use(xss())
 app.use(helmet())
 
+// routes
 app.get('/', (req, res) => res.send('<h1>Social Media API</h1>'))
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', authorize, userRouter)
 app.use('/api/v1/posts', authorize, postRouter)
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
 
 app.use(notFound)
 app.use(errorHandler)

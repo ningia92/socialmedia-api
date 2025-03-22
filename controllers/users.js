@@ -63,24 +63,6 @@ export const deleteUser = async (req, res) => {
   res.status(204).end()
 }
 
-// @desc   Get user posts
-// @route  GET /api/v1/users/:id/posts
-export const getPosts = async (req, res) => {
-  const id = req.params.id
-
-  const user = await User.findById(id).populate('posts', '-author')
-  if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 })
-
-  if (user.posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
-
-  const posts = user.posts
-
-  res.status(200).json({
-    author: user.name,
-    posts
-  })
-}
-
 // @desc   Get user followers
 // @route  GET /api/v1/users/:id/followers
 export const getFollowers = async (req, res) => {

@@ -1,5 +1,19 @@
 import Post from '../models/post.js'
 
+// @desc   Get posts
+// @route  GET /api/v1/posts
+export const getPosts = async (req, res) => {
+  const userId = req.user.userId
+
+  const posts = await Post.find({ author: userId }).select('-author')
+  if (posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
+
+  res.status(200).json({
+    author: user.name,
+    posts
+  })
+}
+
 // @desc   Create a post
 // @route  POST /api/v1/posts
 export const createPost = async (req, res) => {
@@ -72,7 +86,7 @@ export const likeDislikePost = async (req, res) => {
   const post = await Post.findById(id)
 
   if (!post) throw Object.assign(new Error('Post not found'), { statusCode: 404 })
-  
+
   if (!post.likes.includes(userId)) {
     await Post.findByIdAndUpdate(id, { $push: { likes: userId } }, { new: true })
     res.status(200).json({ message: 'The post has been liked' })
