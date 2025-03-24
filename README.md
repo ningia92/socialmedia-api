@@ -43,28 +43,28 @@ Email Validation Regex
 
 #### Major Endpoints
 
-##### Auth
-- POST /api/v1/auth/register --> register a new user
-- POST /api/v1/auth/login --> logs in and return a JWT
+- ##### Auth:
+    - POST /api/v1/auth/register --> register a new user
+    - POST /api/v1/auth/login --> logs in and return a JWT
 
-##### Users
-- GET /api/v1/users/:id --> retrieves user details
-- DELETE /api/v1/users/:id --> deletes a user accounts
-- PATCH /api/v1/users/:id/name --> updates user's name
-- PATCH /api/v1/users/:id/password --> updates user's password
-- GET /api/v1/users/:id/followers --> lists the user's followers
-- GET /api/v1/users/:id/following --> lists the users that the user is following
-- PATCH /api/v1/users/:id/follow --> follows another user
-- PATCH /api/v1/users/:id/unfollow --> unfollows a user
-- GET /api/v1/users/:id/feed --> returns posts from followed users
+- ##### Users:
+    - GET /api/v1/users/:id --> retrieves user details
+    - DELETE /api/v1/users/:id --> deletes a user accounts
+    - PATCH /api/v1/users/:id/name --> updates user's name
+    - PATCH /api/v1/users/:id/password --> updates user's password
+    - GET /api/v1/users/:id/followers --> lists the user's followers
+    - GET /api/v1/users/:id/following --> lists the users that the user is following
+    - PATCH /api/v1/users/:id/follow --> follows another user
+    - PATCH /api/v1/users/:id/unfollow --> unfollows a user
+    - GET /api/v1/users/:id/feed --> returns posts from followed users
 
-##### Posts
-- POST /api/v1/posts/posts --> creates a new post
-- GET /api/v1/posts --> retrieves all user's posts
-- GET /api/v1/posts/:id --> retrieves a single post by ID
-- PATCH /api/v1/posts/:id --> updates an existing post
-- DELETE /api/v1/posts/:id --> deletes a post
-- PATCH /api/v1/posts/:id/like --> toggles like/dislike on a post
+- ##### Posts:
+    - POST /api/v1/posts/posts --> creates a new post
+    - GET /api/v1/posts --> retrieves all user's posts
+    - GET /api/v1/posts/:id --> retrieves a single post by ID
+    - PATCH /api/v1/posts/:id --> updates an existing post
+    - DELETE /api/v1/posts/:id --> deletes a post
+    - PATCH /api/v1/posts/:id/like --> toggles like/dislike on a post
 
 #### Error Handling
 
