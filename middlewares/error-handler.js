@@ -5,9 +5,9 @@ const errorHandler = (err, req, res, next) => {
     statusCode: err.statusCode || 500,
   }
 
-  // mongoose bad data format
+  // mongoose bad id format
   if (err.name === 'CastError') {
-    error.message = 'Invalid data format',
+    error.message = 'Invalid id format',
     error.statusCode = 400
   }
 

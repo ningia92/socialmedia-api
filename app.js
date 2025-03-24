@@ -39,8 +39,8 @@ app.use(rateLimit({
   }
 }))
 
-app.use(cors())
 app.use(morgan('dev'))
+app.use(cors())
 app.use(express.json())
 app.use(mongoSanitize())
 app.use(xss())

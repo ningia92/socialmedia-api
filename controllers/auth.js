@@ -1,5 +1,7 @@
 import User from '../models/user.js'
 
+// @desc   Register user
+// @route  POST /api/v1/auth/register
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body
 
@@ -20,6 +22,8 @@ export const registerUser = async (req, res) => {
   })
 }
 
+// @desc   Login user
+// @route  POST /api/v1/auth/login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body
 
