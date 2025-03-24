@@ -47,7 +47,10 @@ app.use(xss())
 app.use(helmet())
 
 // routes
-app.get('/', (req, res) => res.send('<h1>Social Media API</h1>'))
+app.get('/', (req, res) => res.send(`
+  <h1>Social Media API</h1>
+  <a href='/api-docs'>Swagger Docs</a>
+`))
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', authorize, userRouter)
 app.use('/api/v1/posts', authorize, postRouter)

@@ -138,20 +138,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      tags:
-        - Users
-      summary: Get posts created by the user
-      operationId: getPosts
-      responses:
-        '200':
-          description: List of user's posts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
   /users/{id}/followers:
     parameters:
       - in: path
@@ -475,7 +461,7 @@ components:
         _id:
           type: string
         author:
-          $ref: '#/components/schemas/User'
+          type: string
         title:
           type: string
           maxLength: 50
@@ -485,7 +471,7 @@ components:
         likes:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $type: string
         createdAt:
           type: string
           format: date-time
@@ -494,15 +480,7 @@ components:
           format: date-time
       example:
         _id: "61e8c0a54f1a4c3a4c4f7f1b"
-        author:
-          _id: "61e8c0a54f1a4c3a4c4f7f1a"
-          name: Bob
-          email: bob@example.com
-          followers: []
-          followings: []
-          posts: []
-          createdAt: "2025-03-21T10:00:00.000Z"
-          updatedAt: "2025-03-21T10:00:00.000Z"
+        author: "61e8c0a54f1a4c3a4c4f7f1a"
         title: "My First Post"
         description: "This is the content of my first post."
         likes: []

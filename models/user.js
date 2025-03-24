@@ -24,9 +24,15 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'User password is required'],
     minLength: 6,
   },
-  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-  followings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+  posts: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'Post' }
+  ],
+  followers: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+  ],
+  followings: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+  ]
 }, { timestamps: true })
 
 UserSchema.set('toJSON', {

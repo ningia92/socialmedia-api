@@ -8,10 +8,7 @@ export const getPosts = async (req, res) => {
   const posts = await Post.find({ author: userId }).select('-author')
   if (posts.length === 0) return res.status(200).json({ message: 'No posts yet' })
 
-  res.status(200).json({
-    author: user.name,
-    posts
-  })
+  res.status(200).json({ posts })
 }
 
 // @desc   Create a post

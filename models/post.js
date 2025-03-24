@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 
 const PostSchema = new mongoose.Schema({
   author: {
@@ -16,7 +16,9 @@ const PostSchema = new mongoose.Schema({
     required: [true, 'The description of the post is required'],
     maxLength: 200
   },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  likes: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  ]
 }, { timestamps: true })
 
 PostSchema.set('toJSON', {
